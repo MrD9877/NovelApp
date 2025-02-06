@@ -2,9 +2,11 @@
 import React, { use, useEffect, useState } from "react";
 import { LockKeyhole, LockKeyholeOpen } from "lucide-react";
 import ChapterListNav from "./ChapterListNav";
+import { useRouter } from "next/navigation";
 
 interface ListChaptersComponent {
   listPromise: Promise<Array<Index>>;
+  novelId: string;
 }
 
 export type Index = {
@@ -12,9 +14,10 @@ export type Index = {
   locked: boolean;
 };
 
-export default function ListChapters({ listPromise }: ListChaptersComponent) {
+export default function ListChapters({ listPromise, novelId }: ListChaptersComponent) {
   const [listOrder, setListOrder] = useState(true);
   const [tempList, setTempList] = useState<Array<Index>>();
+  const router = useRouter();
 
   const list = use(listPromise);
 
@@ -37,7 +40,7 @@ export default function ListChapters({ listPromise }: ListChaptersComponent) {
         tempList.map((item, index) => {
           const n = list.length;
           return (
-            <button key={index} className="w-full h-12 grid grid-cols-7 px-2 my-8 text-lg text-start hover:animate-bounce">
+            <button onClick={() => router.push(`/novel/chapter/?novelId=${novelId}&chapter=${index + 1}`)} key={index} className="w-full h-12 grid grid-cols-7 px-2 my-8 text-lg text-start ">
               <span className="mx-3 col-span-1">{(listOrder ? index : n - index) + 1}</span>
               <span className="col-span-5 select-none">{item.title} </span>
               <span className="ml-5 col-span-1">{item.locked ? <LockKeyhole /> : <LockKeyholeOpen />}</span>

@@ -14,11 +14,17 @@ export interface NovelInfo {
   novelId: string;
 }
 interface NovelDisplayComponent {
-  infoPromise: Promise<NovelInfo>;
+  infoPromise: Promise<NovelInfo | null>;
 }
 
 export default function NovelDisplay({ infoPromise }: NovelDisplayComponent) {
   const novelInfo = use(infoPromise);
+  if (!novelInfo)
+    return (
+      <>
+        <div className="h-screen w-fit mx-auto">No Such Book If found Try again</div>
+      </>
+    );
   return (
     <div>
       {/* cover  */}

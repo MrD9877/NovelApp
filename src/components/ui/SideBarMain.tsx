@@ -5,6 +5,7 @@ import { BookMarked, Home, MessageSquareMore, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ModeToggle from "./ThemeButton";
+import { useEffect } from "react";
 
 const items = [
   {
@@ -39,9 +40,12 @@ type MenuBadge = {
   Community: number;
 };
 export default function SideBarMain() {
-  const [menuBadgeNumbers, setMenuBadge] = useState<MenuBadge>({ Notifications: 0, Community: 2 });
   const pathname = usePathname();
+  const [menuBadgeNumbers, setMenuBadge] = useState<MenuBadge>({ Notifications: 0, Community: 2 });
 
+  useEffect(() => {
+    setMenuBadge({ Notifications: 0, Community: 2 });
+  }, []);
   return (
     <>
       <Sidebar>

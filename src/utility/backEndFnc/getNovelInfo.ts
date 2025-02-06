@@ -1,5 +1,7 @@
-export const getNovelInfo = async () => {
-  console.log("server");
+import { NovelInfo } from "@/components/templates/NovelDisplay";
+
+export const getNovelInfo = async (novelId: string | null | undefined): Promise<NovelInfo | null> => {
+  if (!novelId) return null;
   const promise = new Promise((ress) => {
     setTimeout(() => {
       ress("d");
@@ -10,7 +12,7 @@ export const getNovelInfo = async () => {
     totalChapters: 99,
     lastUpdate: new Date(),
     cover: "String",
-    title: "String",
+    title: "String this is a longer Titile sjcnasovcdkjvnkj ",
     author: "String",
     novelId: "Dvsdvds",
   };

@@ -1,5 +1,5 @@
-export const getNovelIndex = async () => {
-  console.log("server");
+export const getNovelIndex = async (novelId: string | undefined | null) => {
+  console.log(novelId);
   const promise = new Promise((ress) => {
     setTimeout(() => {
       ress("d");

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import SideBarMain from "@/components/ui/SideBarMain";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import SideBarNavigator from "@/components/ui/SideBarNavigator";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,11 +20,12 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <SidebarProvider>
-            <SideBarMain />
+            <SideBarNavigator />
             <main>
               <SidebarTrigger />
               {children}
             </main>
+            <Toaster />
           </SidebarProvider>
         </ThemeProvider>
       </body>
