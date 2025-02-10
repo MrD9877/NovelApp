@@ -2,8 +2,18 @@
 import React, { useState } from "react";
 
 interface OverViewComponent {
-  overview: string;
+  overview: string[];
   className?: string;
+}
+
+function DisplayOverview({ overview }: { overview: string[] }) {
+  return (
+    <>
+      {overview.map((item, index) => {
+        return <p key={index}>{item}</p>;
+      })}
+    </>
+  );
 }
 
 export default function OverView({ overview, className }: OverViewComponent) {
@@ -13,18 +23,22 @@ export default function OverView({ overview, className }: OverViewComponent) {
       <div className="text-start text-xl pb-2">Overview</div>
       {/* overview  */}
       <div className="text-sidebar dark:text-themeLightText">
-        {overview.length < 100 && <div>{overview}</div>}
-        {overview.length > 100 &&
+        {overview.length < 2 && (
+          <div>
+            <DisplayOverview overview={overview} />
+          </div>
+        )}
+        {overview.length > 2 &&
           (readMore ? (
             <div>
-              {overview}.
+              <DisplayOverview overview={overview} />
               <button className="text-blue-700" onClick={() => setReadMore(false)}>
                 ...Read Less
               </button>
             </div>
           ) : (
             <div>
-              {overview.split("").slice(0, 100).join("")}...
+              {<DisplayOverview overview={overview.slice(0, 2)} />}...
               <button className="text-blue-700" onClick={() => setReadMore(true)}>
                 Read More
               </button>

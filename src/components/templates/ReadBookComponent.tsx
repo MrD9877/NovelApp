@@ -1,19 +1,15 @@
 "use client";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import BookHiddenNav from "@/components/templates/BookHiddenNav";
-import { useRef } from "react";
-import useOutSideAlart from "@/hooks/useOutsideAlart";
-import { use } from "react";
-import { GetContentReturn } from "@/utility/backEndFnc/getContent";
 import { ChapterParamType } from "@/app/novel/chapter/page";
 import useSwipeNext from "@/hooks/useSwipeNext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import useHiddenNav from "@/hooks/useHiddenNav";
+import { ChapterType } from "@/schema/chapter";
 
 interface ReadBookComponentType {
-  chapterDataPromise: Promise<GetContentReturn>;
   searchParams: ChapterParamType;
 }
 export enum FontStyles {
@@ -22,7 +18,12 @@ export enum FontStyles {
   cursive = "cursive",
 }
 
-function SwipeSpinnerComponent({ setLoading, searchParams }: { setLoading: React.Dispatch<React.SetStateAction<boolean>>; searchParams: ChapterParamType }) {
+export interface SwipeSpinnerComponent {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  searchParams: ChapterParamType;
+}
+
+function SwipeSpinnerComponent({ setLoading, searchParams }: SwipeSpinnerComponent) {
   const [nextSpinner, toNext, setToNext] = useSwipeNext();
   const router = useRouter();
 
@@ -45,49 +46,55 @@ function SwipeSpinnerComponent({ setLoading, searchParams }: { setLoading: React
   );
 }
 
-export default function ReadBookComponent({ chapterDataPromise, searchParams }: ReadBookComponentType) {
-  const [displayNav, setDisplayNav] = useState(false);
-  const [fontSize, setFont] = useState<number>(22);
-  const [fontStyle, setfonstStyle] = useState<FontStyles>(FontStyles.serif);
+export default function ReadBookComponent({ searchParams }: ReadBookComponentType) {
   const [loading, setLoading] = useState(false);
-
-  const timer = useRef<NodeJS.Timeout>(null);
+  const [content, setContent] = useState<ChapterType>();
   const navBar = useRef<HTMLDivElement>(null);
+  const [componentFont, displayNav] = useHiddenNav(navBar);
+  const { fontSize, fontStyle } = componentFont;
 
-  const isInside = useOutSideAlart(navBar, showNav);
-  void isInside;
-  const content = use(chapterDataPromise);
-
-  function showNav(inside: boolean) {
-    if (timer.current) {
-      clearTimeout(timer.current);
-    }
-    if (inside) {
-      setDisplayNav(true);
-    } else {
-      setDisplayNav(!displayNav);
-      timer.current = setTimeout(() => {
-        setDisplayNav(false);
-      }, 3000);
-    }
-  }
+  const fetchContent = async (novelId: string, chapter: string) => {
+    setLoading(true);
+    try {
+      console.log(chapter);
+      const res = await fetch(`/api/chapter?novelId=${novelId}&chapter=${chapter}`);
+      const data = await res.json();
+      setContent(data);
+    } catch {}
+  };
 
   useEffect(() => {
-    setLoading(false);
+    if (content) {
+      setLoading(false);
+    }
   }, [content]);
+
+  useEffect(() => {
+    if (searchParams) {
+      fetchContent(searchParams.novelId, searchParams.chapter);
+    }
+  }, [searchParams]);
+
   if (loading) return <LoadingSpinner width="100vw" height="30vh" />;
   return (
     <div className="w-screen py-4">
       {content && (
         <div className="px-4">
-          <div className="select-none w-fit mx-auto text-xl my-3 font-bold">{content.topic}</div>
-          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontSize: `${fontSize}px`, lineHeight: `${fontSize + 1 + fontSize / 5}px`, fontFamily: fontStyle }} className="select-none">
-            {content.content}
-          </pre>
+          <div className="select-none w-fit mx-auto text-xl my-3 font-bold">{content.title}</div>
+          <div style={{ fontSize: `${fontSize}px`, lineHeight: `${fontSize + 1 + fontSize / 5}px`, fontFamily: fontStyle }} className="select-none">
+            {content.content &&
+              content.content.map((item, index) => {
+                return (
+                  <div className="my-2" key={index}>
+                    <p>{item}</p>
+                  </div>
+                );
+              })}
+          </div>
         </div>
       )}
       <div ref={navBar} style={{ display: displayNav ? "" : "none" }} className=" w-screen ">
-        <BookHiddenNav setFont={setFont} fontSize={fontSize} setfonstStyle={setfonstStyle} fontStyle={fontStyle} />
+        <BookHiddenNav componentFont={componentFont} />
       </div>
 
       <div className="flex flex-col gap-4 h-[30vh] justify-end">

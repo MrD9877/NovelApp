@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { BookMarked, Home, MessageSquareMore, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ModeToggle from "./ThemeButton";
 import { useEffect } from "react";
+import Image from "next/image";
 
 const items = [
   {
@@ -42,6 +43,7 @@ type MenuBadge = {
 export default function SideBarMain() {
   const pathname = usePathname();
   const [menuBadgeNumbers, setMenuBadge] = useState<MenuBadge>({ Notifications: 0, Community: 2 });
+  const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
     setMenuBadge({ Notifications: 0, Community: 2 });
@@ -52,7 +54,9 @@ export default function SideBarMain() {
         <SidebarContent>
           <SidebarGroup className="justify-between flex-row items-center pb-0 pr-4 pt-3">
             {/* app icon  */}
-            <MessageSquareMore />
+            <Link href={"/home"} onClick={() => toggleSidebar()}>
+              <Image width={40} height={40} src={"/images/icon.ico"} alt="icon" />
+            </Link>
             {/* dark light mode  */}
             <ModeToggle />
           </SidebarGroup>
@@ -62,7 +66,7 @@ export default function SideBarMain() {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={() => toggleSidebar()}>
                       <SidebarMenuButton asChild isActive={pathname === item.url}>
                         <div>
                           <item.icon />

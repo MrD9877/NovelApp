@@ -44,6 +44,5 @@ export default function useSwipeNext() {
     };
   }, [nextSpinner, touchStartY]);
 
-  const arr: [boolean, boolean, React.Dispatch<React.SetStateAction<boolean>>] = [nextSpinner, toNext, setToNext];
-  return arr;
+  return [nextSpinner, toNext, setToNext] as const;
 }

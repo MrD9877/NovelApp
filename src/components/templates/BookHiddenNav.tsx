@@ -10,14 +10,15 @@ import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FontStyles } from "./ReadBookComponent";
 
-interface FontState {
+export interface FontState {
   setFont: React.Dispatch<React.SetStateAction<number>>;
   fontSize: number;
   setfonstStyle: React.Dispatch<React.SetStateAction<FontStyles>>;
   fontStyle: FontStyles;
 }
 
-function HiddenNavAlphabet({ setFont, fontSize, setfonstStyle, fontStyle }: FontState) {
+function HiddenNavAlphabet({ componentFont }: { componentFont: FontState }) {
+  const { setFont, fontSize, setfonstStyle, fontStyle } = componentFont;
   const onValueChangeSize = (setArray: number[]) => {
     setFont(setArray[0]);
   };
@@ -45,7 +46,7 @@ function HiddenNavAlphabet({ setFont, fontSize, setfonstStyle, fontStyle }: Font
   );
 }
 
-export default function BookHiddenNav(props: FontState) {
+export default function BookHiddenNav({ componentFont }: { componentFont: FontState }) {
   const [displayNav, setDisplayNav] = useState(false);
   const navBar = useRef<HTMLDivElement>(null);
   const isInside = useOutSideAlart(navBar, showNav);
@@ -63,7 +64,7 @@ export default function BookHiddenNav(props: FontState) {
     <div className="md:invisible text-white">
       {displayNav && (
         <div ref={navBar}>
-          <HiddenNavAlphabet setFont={props.setFont} fontSize={props.fontSize} setfonstStyle={props.setfonstStyle} fontStyle={props.fontStyle} />
+          <HiddenNavAlphabet componentFont={componentFont} />
         </div>
       )}
       <div className=" bg-themeSuperDark/70 h-20  flex items-center m-0  justify-between px-6 fixed bottom-0 w-screen">

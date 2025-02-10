@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.5",
@@ -21,25 +23,34 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
     "lucide-react": "^0.474.0",
+    "mongoose": "^8.10.0",
     "next": "15.1.6",
     "next-themes": "^0.4.4",
+    "puppeteer": "^24.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "uchiha-itachi": "^2.0.0"
+    "uchiha-itachi": "^2.0.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/next": "^8.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
