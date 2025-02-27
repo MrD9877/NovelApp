@@ -29,5 +29,5 @@ export default function SideBarNavigator() {
   }, [pathname]);
 
   if (displaySideBar === "sidebar for novels chapter") return <SideBarNovelChapter />;
-  if (displaySideBar === "main side bar use in most throughout the app") return <SideBarMain />;
+  else return <SideBarMain />;
 }

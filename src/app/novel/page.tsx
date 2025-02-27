@@ -15,10 +15,10 @@ interface NovelPage {
 
 export default async function NovelPage({ searchParams }: NovelPage) {
   const params: paramType = await searchParams;
-  if (!params) redirect("/notFound");
+  if (!params?.novelId) redirect("/notFound");
 
   return (
-    <div>
+    <div className="mb-10">
       <NavbarMain />
       <NovelDisplay novelId={params.novelId} />
     </div>

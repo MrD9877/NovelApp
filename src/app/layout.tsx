@@ -4,6 +4,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import SideBarNavigator from "@/components/ui/SideBarNavigator";
 import { Toaster } from "@/components/ui/sonner";
+import QueryProvider from "@/components/providers/queryProvider";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,14 +21,17 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <SidebarProvider>
-            <SideBarNavigator />
-            <main>
-              <SidebarTrigger />
-              {children}
-            </main>
-            <Toaster />
-          </SidebarProvider>
+          <QueryProvider>
+            <SidebarProvider>
+              <SideBarNavigator />
+              <main>
+                <SidebarTrigger />
+                <ReactQueryDevtools />
+                {children}
+              </main>
+              <Toaster />
+            </SidebarProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

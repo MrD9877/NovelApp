@@ -3,8 +3,9 @@ import ContentLink from "@/components/templates/ContentLink";
 import OverView from "@/components/templates/OverView";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
 import NovelInfoSkeleton from "../skeletons/NovelInfoSkeleton";
+import { useQuery } from "@tanstack/react-query";
+import ErrorPage from "./ErrorPage";
 
 export interface NovelInfo {
   overview: string[];
@@ -24,21 +25,21 @@ interface NovelDisplayComponent {
 }
 
 export default function NovelDisplay({ novelId }: NovelDisplayComponent) {
-  const [novelInfo, setNovelInfo] = useState<NovelInfo>();
-
-  const fetchInfo = useCallback(async () => {
-    try {
+  const {
+    isPending,
+    error,
+    data: novelInfo,
+  } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: async () => {
       const res = await fetch(`/api/novelInfo?novelId=${novelId}`);
-      const info = await res.json();
-      setNovelInfo(info);
-    } catch {}
-  }, [novelId]);
+      const jsonData = await res.json();
+      if (res.status !== 200) throw new Error(jsonData.msg || "error");
+      return jsonData;
+    },
+  });
 
-  useEffect(() => {
-    fetchInfo();
-  }, [novelId, fetchInfo]);
-
-  if (!novelInfo)
+  if (isPending)
     return (
       <>
         <div className="h-screen w-fit mx-auto">
@@ -46,6 +47,7 @@ export default function NovelDisplay({ novelId }: NovelDisplayComponent) {
         </div>
       </>
     );
+  if (error) return <ErrorPage message={error.message} />;
   return (
     <div>
       {/* cover  */}
