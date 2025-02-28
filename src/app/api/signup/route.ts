@@ -7,8 +7,10 @@ export async function POST(request: Request) {
   await dbConnect();
   const body = await request.json();
   const cookieStore = await cookies();
-  const { email, password, userName } = body;
+  const { password } = body;
   try {
+    const email = body.email.trim().toLowerCase();
+    const userName = body.userName.trim().toLowerCase();
     const checkUser = await User.findOne({ email });
     if (checkUser) return new Response(JSON.stringify({ msg: "Email Already in use to Register an Account." }), { status: 400 });
     const hashedPassword = await hashPassword(password);

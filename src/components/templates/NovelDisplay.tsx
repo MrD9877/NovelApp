@@ -8,6 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import ErrorPage from "./ErrorPage";
 import { useRouter } from "next/navigation";
 import addNovelToLiberary from "@/utility/addToLibrary";
+import useUser from "@/hooks/useUser";
+import useNovelLibrary from "@/hooks/useNovelLibrary";
 
 export interface NovelInfo {
   overview: string[];
@@ -28,6 +30,8 @@ interface NovelDisplayComponent {
 
 export default function NovelDisplay({ novelId }: NovelDisplayComponent) {
   const router = useRouter();
+  const { reFetch } = useUser();
+  const [isAdded] = useNovelLibrary(novelId);
   const {
     isPending,
     error,
@@ -41,6 +45,11 @@ export default function NovelDisplay({ novelId }: NovelDisplayComponent) {
       return jsonData;
     },
   });
+
+  const handleAddLibrary = async (novelId: string) => {
+    await addNovelToLiberary(novelId);
+    await reFetch();
+  };
 
   if (isPending)
     return (
@@ -81,9 +90,7 @@ export default function NovelDisplay({ novelId }: NovelDisplayComponent) {
               Read Now
             </button>
           </div>
-          <div className="bg-white text-black flex justify-center rounded-sm px-2 py-1 absolute right-10">
-            <button onClick={() => addNovelToLiberary(novelId)}>+</button>
-          </div>
+          <div className="bg-white text-black flex justify-center rounded-sm px-2 py-1 absolute right-10">{isAdded ? <button onClick={() => handleAddLibrary(novelId)}>✔</button> : <button onClick={() => handleAddLibrary(novelId)}>+</button>}</div>
         </div>
       </div>
     </div>

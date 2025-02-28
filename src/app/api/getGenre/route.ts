@@ -1,7 +1,7 @@
 import dbConnect from "@/lib/MonodbConnet";
 import { Explore } from "@/schema/genre";
 import getCoverByGenre from "../utilities/getCoverByGenre";
-import { Category } from "@/app/explore/page";
+import { Category } from "@/app/(routes)/explore/page";
 
 type Genres = { genre: Array<string> };
 

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-type Library = {
+export type Library = {
   novelId: string;
   lastRead: number;
 };
-type Unlocked = {
+export type Unlocked = {
   novelId: string;
   chapters: number[];
 };
