@@ -74,6 +74,54 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+.weInputContainer {
+  width: fit-content;
+  height: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.weinputdiv {
+  border: 2px solid theme("colors.weblue");
+  border-radius: 22px;
+}
+
+.weLabelDiv {
+  position: flex;
+  height: 10px;
+  width: fit-content;
+}
+
+.weLabel {
+  color: theme("colors.weblue");
+  position: absolute;
+  background: white;
+  margin-left: 28px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.weinput {
+  width: 80vw;
+  border: 0px solid white;
+  height: 30px;
+  padding-left: 9px;
+  margin: 10px;
+  margin-top: 12px;
+}
+
+.weinput:focus {
+  outline: none;
+}
+
+.weButton {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background: theme("colors.weblue");
+  border-radius: 0.5rem;
+  width: 60px;
+}
 
 body {
   color: var(--foreground);

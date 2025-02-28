@@ -2,8 +2,7 @@
 import ErrorPage from "@/components/templates/ErrorPage";
 import ExploreCard from "@/components/ui/ExploreCard";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import React from "react";
 
 export type Category = {
   src: string;
@@ -12,10 +11,6 @@ export type Category = {
 export type ErrorResponse = { msg: string };
 
 export default function ExplorePage() {
-  const searchParams = useSearchParams();
-
-  const search = searchParams.get("search");
-
   const {
     isPending,
     error,
@@ -37,15 +32,14 @@ export default function ExplorePage() {
 
   if (isPending) return <div>Loading....</div>;
   if (error) return <ErrorPage message={error.message} />;
-  if (search) return <>{search}</>;
 
   return (
     <div>
       <div className="flex flex-wrap gap-4 justify-center items-center">
-        {category &&
-          category.map((item) => {
+        {Array.isArray(category) &&
+          category.map((item, index) => {
             return (
-              <div key={item.genre}>
+              <div key={index}>
                 <ExploreCard src={item.src} text={item.genre} />
               </div>
             );

@@ -12,6 +12,8 @@ export default {
         themeDarkBg: "#212121",
         themeSuperLight: "#757575",
         themeSuperDark: "#1b1b1f",
+        weblue: "#27b1b2",
+        weChat: "#B5E2E2",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

@@ -3,9 +3,9 @@ import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import SideBarNavigator from "@/components/ui/SideBarNavigator";
-import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/components/providers/queryProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import ThemeToaster from "@/components/ui/ThemeToaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,8 +28,8 @@ export default function RootLayout({
                 <SidebarTrigger />
                 <ReactQueryDevtools />
                 {children}
+                <ThemeToaster />
               </main>
-              <Toaster />
             </SidebarProvider>
           </QueryProvider>
         </ThemeProvider>
