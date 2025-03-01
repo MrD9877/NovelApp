@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { Document } from "mongoose";
 const { Schema } = mongoose;
 
 export type ChapterType = {
@@ -8,8 +9,8 @@ export type ChapterType = {
   chapterId: string;
   novelId: string;
 };
-
-const chapterSchema = new Schema(
+export interface IChapter extends ChapterType, Document {}
+const chapterSchema = new Schema<IChapter>(
   {
     novelId: {
       type: Schema.Types.String,
@@ -37,5 +38,5 @@ const chapterSchema = new Schema(
   { timestamps: true }
 );
 
-const ChapterModel = mongoose.models.Chapter || mongoose.model("Chapter", chapterSchema);
+const ChapterModel: Model<IChapter> = mongoose.models.Chapter || mongoose.model<IChapter>("Chapter", chapterSchema);
 export { ChapterModel as Chapter };

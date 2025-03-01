@@ -1,26 +1,18 @@
-import mongoose from "mongoose";
+import { NovelInfoType } from "@/validators/novelInfo";
+import mongoose, { Document, Model } from "mongoose";
 const { Schema } = mongoose;
 
-interface Index {
+interface IndexType {
   chapterId: string;
   updateDate: string;
   title: string;
 }
-
-export interface NovelInfoBackend {
-  overview: string[];
-  totalChapters: number;
-  lastUpdate: Date;
-  cover: string;
-  name: string;
-  author: string;
-  novelId: string;
-  genres: string[];
-  tags: string;
-  status: string;
-  index: Index[];
+export interface Index {
+  index: IndexType[];
 }
-const novelSchema = new Schema(
+export interface INovel extends Document, NovelInfoType, Index {}
+
+const novelSchema = new Schema<INovel>(
   {
     novelId: {
       type: Schema.Types.String,
@@ -82,5 +74,5 @@ novelSchema.pre("save", function (next) {
   next();
 });
 novelSchema.index({ name: "text", tags: "text", genres: "text" });
-const NovelModel = mongoose.models.Novel || mongoose.model("Novel", novelSchema);
+const NovelModel: Model<INovel> = mongoose.models.Novel || mongoose.model<INovel>("Novel", novelSchema);
 export { NovelModel as Novel };

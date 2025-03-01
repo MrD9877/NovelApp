@@ -1,14 +1,12 @@
 import dbConnect from "@/lib/MonodbConnet";
-import { Explore } from "@/schema/genre";
+import { Explore, IExplore } from "@/schema/genre";
 import getCoverByGenre from "../utilities/getCoverByGenre";
 import { Category } from "@/app/(routes)/explore/page";
-
-type Genres = { genre: Array<string> };
 
 export async function GET() {
   await dbConnect();
   try {
-    const genres: Genres[] = await Explore.find();
+    const genres: IExplore[] | null = await Explore.find();
     const data: Array<Category> = [];
     for (let i = 0; i < genres[0].genre.length; i++) {
       const genre = genres[0].genre[i];

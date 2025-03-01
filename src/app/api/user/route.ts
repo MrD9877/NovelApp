@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/MonodbConnet";
-import { User, UserType } from "@/schema/user";
+import { IUser, User } from "@/schema/user";
 import { cookies } from "next/headers";
 import { authUser } from "../utilities/authUser";
 
@@ -9,7 +9,7 @@ export async function GET() {
   try {
     const userData = await authUser(cookieStore);
     if (!userData) return new Response(JSON.stringify({ msg: "UnAuthorized" }), { status: 401 });
-    const user: UserType = await User.findOne({ email: userData.email });
+    const user: IUser = await User.findOne({ email: userData.email });
     if (user) return new Response(JSON.stringify({ userName: user.userName, email: user.email, library: user.library, unlocked: user.unlocked }), { status: 200 });
     else return new Response(JSON.stringify({ msg: "user not found" }), { status: 404 });
   } catch (err) {

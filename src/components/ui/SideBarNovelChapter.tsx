@@ -5,13 +5,13 @@ import { LockKeyhole, LockKeyholeOpen } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { NovelInfo } from "../templates/NovelDisplay";
 import Image from "next/image";
 import { Index } from "../templates/ListChapters";
 import LoadingSpinner from "./LoadingSpinner";
+import { NovelInfoType } from "@/validators/novelInfo";
 
 export default function SideBarNovelChapter() {
-  const [novelInfo, setNovelInfo] = useState<NovelInfo | null>(null);
+  const [novelInfo, setNovelInfo] = useState<NovelInfoType | null>(null);
   const searchParams = useSearchParams();
   const novelId = searchParams.get("novelId");
   const currentChapter = searchParams.get("chapter");
@@ -25,7 +25,7 @@ export default function SideBarNovelChapter() {
       if (activeBtn.current) {
         activeBtn.current.scrollIntoView();
       }
-    }, 3000);
+    }, 1000);
   }, [openMobile]);
 
   const [items, setItem] = useState<Index[]>();

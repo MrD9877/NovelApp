@@ -46,7 +46,7 @@ function HiddenNavAlphabet({ componentFont }: { componentFont: FontState }) {
   );
 }
 
-export default function BookHiddenNav({ componentFont }: { componentFont: FontState }) {
+export default function BookHiddenNav({ componentFont, setDisplayCommets }: { componentFont: FontState; setDisplayCommets: React.Dispatch<React.SetStateAction<boolean>> }) {
   const [displayNav, setDisplayNav] = useState(false);
   const navBar = useRef<HTMLDivElement>(null);
   const isInside = useOutSideAlart(navBar, showNav);
@@ -80,7 +80,7 @@ export default function BookHiddenNav({ componentFont }: { componentFont: FontSt
             <path d="m3 16 4.5-9 4.5 9" />
           </svg>
         </button>
-        <MessageCircleCode className="w-[30] h-[30]" />
+        <MessageCircleCode onClick={() => setDisplayCommets(true)} className="w-[30] h-[30]" />
       </div>
     </div>
   );

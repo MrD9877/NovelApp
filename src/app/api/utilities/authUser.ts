@@ -8,6 +8,7 @@ export const authUser = async (cookieStore: ReadonlyRequestCookies) => {
     const userData = await verifyToken(accessToken.value);
     if (!userData) {
       const data = await refreshToken(cookieStore);
+      console.log(data);
       if (!data) return false;
       return data;
     } else {

@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/MonodbConnet";
-import { User } from "@/schema/user";
+import { IUser, User } from "@/schema/user";
 
 import { cookies } from "next/headers";
 import { verifyPasswordFn } from "../utilities/hashPassword";
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const { password } = body;
   try {
     const email = body.email.trim().toLowerCase();
-    const user = await User.findOne({ email });
+    const user: IUser = await User.findOne({ email });
     if (!user) return new Response(JSON.stringify({ msg: "No User Found" }), { status: 400 });
     const verifyPassword = await verifyPasswordFn(password, user.password);
     if (verifyPassword) {

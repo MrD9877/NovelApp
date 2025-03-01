@@ -6,11 +6,14 @@ import { useSelector } from "react-redux";
 export default function useNovelLibrary(novelId: string) {
   const library = useSelector((state: StoreState) => state.library);
   const [isAdded, setAdded] = useState<boolean>(false);
+  const [lastRead, setLastRead] = useState<number>(1);
 
   useEffect(() => {
-    const check = library.findIndex((data) => data.novelId === novelId);
-    if (check !== -1) setAdded(true);
-    else setAdded(false);
+    const check = library.find((data) => data.novelId === novelId);
+    if (check) {
+      setAdded(true);
+      setLastRead(check.lastRead);
+    } else setAdded(false);
   }, [library, novelId]);
-  return [isAdded];
+  return [isAdded, lastRead];
 }

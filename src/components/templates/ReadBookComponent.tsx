@@ -1,13 +1,17 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BookHiddenNav from "@/components/templates/BookHiddenNav";
-import { ChapterParamType } from "@/app/novel/chapter/page";
 import useSwipeNext from "@/hooks/useSwipeNext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import useHiddenNav from "@/hooks/useHiddenNav";
-import { ChapterType } from "@/schema/chapter";
+import { ChapterParamType } from "@/app/(routes)/novel/chapter/page";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import ErrorPage from "./ErrorPage";
+import { fetchContent } from "@/utility/fetchFn/fetchContent";
+import { fetchLastRead } from "@/utility/fetchFn/fetchLastRead";
+import CommentSection from "./CommentSection";
 
 interface ReadBookComponentType {
   searchParams: ChapterParamType;
@@ -19,21 +23,19 @@ export enum FontStyles {
 }
 
 export interface SwipeSpinnerComponent {
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   searchParams: ChapterParamType;
 }
 
-function SwipeSpinnerComponent({ setLoading, searchParams }: SwipeSpinnerComponent) {
+function SwipeSpinnerComponent({ searchParams }: SwipeSpinnerComponent) {
   const [nextSpinner, toNext, setToNext] = useSwipeNext();
   const router = useRouter();
 
   useEffect(() => {
     if (toNext) {
       setToNext(false);
-      setLoading(true);
       router.push(`/novel/chapter?novelId=${searchParams?.novelId}&chapter=${Number(searchParams?.chapter) + 1}`);
     }
-  }, [toNext, router, searchParams, setLoading, setToNext]);
+  }, [toNext, router, searchParams, setToNext]);
 
   return (
     <>
@@ -47,35 +49,54 @@ function SwipeSpinnerComponent({ setLoading, searchParams }: SwipeSpinnerCompone
 }
 
 export default function ReadBookComponent({ searchParams }: ReadBookComponentType) {
-  const [loading, setLoading] = useState(false);
-  const [content, setContent] = useState<ChapterType>();
   const navBar = useRef<HTMLDivElement>(null);
   const [componentFont, displayNav] = useHiddenNav(navBar);
   const { fontSize, fontStyle } = componentFont;
+  const [displayComments, setDisplayCommets] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchContent = async (novelId: string, chapter: string) => {
-    setLoading(true);
-    try {
-      console.log(chapter);
-      const res = await fetch(`/api/chapter?novelId=${novelId}&chapter=${chapter}`);
-      const data = await res.json();
-      setContent(data);
-    } catch {}
-  };
+  const {
+    data: content,
+    isLoading,
+    isError,
+    error,
+    isFetched,
+  } = useQuery({
+    queryKey: ["chapter", Number(searchParams.chapter), searchParams.novelId],
+    queryFn: async () => await fetchContent(searchParams.novelId, searchParams.chapter),
+    retry: (failcount, error) => {
+      if (error.message.includes("chapter")) return false;
+      if (failcount === 3) return false;
+      else return true;
+    },
+  });
+
+  const updateReadChapterQuery = useQuery({
+    queryKey: ["lastRead", searchParams.chapter, searchParams.novelId],
+    queryFn: async () => await fetchLastRead(searchParams.novelId, searchParams.chapter),
+    enabled: content !== undefined,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: (failcount, error) => {
+      if (error.message.includes("library")) return false;
+      if (failcount === 2) return false;
+      else return true;
+    },
+  });
+  void updateReadChapterQuery;
 
   useEffect(() => {
-    if (content) {
-      setLoading(false);
+    if (isFetched) {
+      queryClient.prefetchQuery({
+        queryKey: ["chapter", Number(searchParams.chapter) + 1, searchParams.novelId],
+        queryFn: async () => await fetchContent(searchParams.novelId, Number(searchParams.chapter) + 1),
+      });
     }
-  }, [content]);
+  }, [isFetched, queryClient, searchParams]);
 
-  useEffect(() => {
-    if (searchParams) {
-      fetchContent(searchParams.novelId, searchParams.chapter);
-    }
-  }, [searchParams]);
-
-  if (loading) return <LoadingSpinner width="100vw" height="30vh" />;
+  if (isLoading && !isFetched) return <LoadingSpinner width="100vw" height="30vh" />;
+  if (isError) return <ErrorPage message={error.message} />;
+  if (displayComments) return <CommentSection novelId={searchParams.novelId} chapter={searchParams.chapter} setDisplayCommets={setDisplayCommets} />;
   return (
     <div className="w-screen py-4">
       {content && (
@@ -94,7 +115,7 @@ export default function ReadBookComponent({ searchParams }: ReadBookComponentTyp
         </div>
       )}
       <div ref={navBar} style={{ display: displayNav ? "" : "none" }} className=" w-screen ">
-        <BookHiddenNav componentFont={componentFont} />
+        <BookHiddenNav componentFont={componentFont} setDisplayCommets={setDisplayCommets} />
       </div>
 
       <div className="flex flex-col gap-4 h-[30vh] justify-end">
@@ -103,8 +124,7 @@ export default function ReadBookComponent({ searchParams }: ReadBookComponentTyp
           <ChevronDown />
         </div>
       </div>
-
-      <SwipeSpinnerComponent setLoading={setLoading} searchParams={searchParams} />
+      <SwipeSpinnerComponent searchParams={searchParams} />
     </div>
   );
 }

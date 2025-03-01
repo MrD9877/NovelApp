@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/MonodbConnet";
-import { Novel } from "@/schema/novel";
+import { INovel, Novel } from "@/schema/novel";
 
 export async function GET(request: Request) {
   await dbConnect();
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const genre = searchParams.get("genre");
   if (!search && !genre) return new Response(JSON.stringify({ msg: "Missing Params" }), { status: 400 });
   try {
-    let novels;
+    let novels: Partial<INovel>[] | null | undefined;
     if (search) {
       novels = await Novel.aggregate([
         {

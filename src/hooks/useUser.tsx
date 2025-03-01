@@ -1,12 +1,9 @@
 "use client";
 import { setUser, store } from "@/redux/userSlice";
-import { useEffect, useState } from "react";
+import { LibrarySchema } from "@/validators/library";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
-const LibrarySchema = z.object({
-  novelId: z.string(),
-  lastRead: z.number(),
-});
 const UnlockedSchema = z.object({
   novelId: z.string(),
   chapters: z.array(z.number()),
@@ -14,42 +11,42 @@ const UnlockedSchema = z.object({
 const UserSchema = z.object({
   userName: z.string(),
   email: z.string().email(),
-  library: z.array(LibrarySchema),
+  library: LibrarySchema,
   unlocked: z.array(UnlockedSchema),
 });
 
-type UserData = z.infer<typeof UserSchema>;
+export type UserData = z.infer<typeof UserSchema>;
 
 export default function useUser() {
-  const [userData, setUserData] = useState<UserData>();
-  const [isPending, setPending] = useState(false);
-
+  const queryClient = useQueryClient();
   const fetchUser = async () => {
     console.log("fetch");
     try {
-      setPending(true);
       const response = await fetch("/api/user");
       if (response.status === 200) {
         const user = await response.json();
-        setUserData(UserSchema.parse(user));
+        store.dispatch(setUser({ ...user }));
+        return UserSchema.parse(user);
       } else {
         throw Error("error");
       }
-    } catch {
-    } finally {
-      setPending(false);
+    } catch (err) {
+      throw Error(err);
     }
   };
 
-  const reFetch = async () => {
-    fetchUser();
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: fetchUser,
+  });
+
+  const mutateUser = useMutation({
+    mutationFn: () => queryClient.invalidateQueries({ queryKey: ["user"] }),
+  });
+
+  const reFetch = () => {
+    mutateUser.mutate();
   };
 
-  useEffect(() => {
-    if (userData) {
-      store.dispatch(setUser({ ...userData }));
-      console.log("dispatch");
-    }
-  }, [userData]);
-  return { reFetch, isPending, userData };
+  return { reFetch, userData: userQuery.data };
 }

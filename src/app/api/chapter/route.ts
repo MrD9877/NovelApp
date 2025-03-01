@@ -1,6 +1,6 @@
 import dbConnect from "@/lib/MonodbConnet";
-import { Chapter, ChapterType } from "@/schema/chapter";
-import { Novel, NovelInfoBackend } from "@/schema/novel";
+import { Chapter, IChapter } from "@/schema/chapter";
+import { Index, Novel } from "@/schema/novel";
 
 export async function GET(request: Request) {
   await dbConnect();
@@ -9,10 +9,10 @@ export async function GET(request: Request) {
   const chapterNumber = searchParams.get("chapter");
   if (!novelId || !chapterNumber) return new Response(JSON.stringify({ msg: "Missing Params" }), { status: 400 });
   try {
-    const novel: Pick<NovelInfoBackend, "index"> | null | undefined = await Novel.findOne({ novelId }, { index: 1, _id: 0 });
+    const novel: Index | null = await Novel.findOne({ novelId }, { index: 1, _id: 0 });
     if (novel) {
       if (!novel.index[Number(chapterNumber) - 1]) {
-        return new Response(JSON.stringify({ msg: "No such novel Found" }), { status: 400 });
+        return new Response(JSON.stringify({ msg: "No such chapter Found" }), { status: 400 });
       }
       const chapterId = novel.index[Number(chapterNumber) - 1].chapterId;
 
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         return new Response(JSON.stringify({ msg: "No such chapterId" }), { status: 400 });
       }
 
-      const chapter: ChapterType | null | undefined = await Chapter.findOne({ chapterId });
+      const chapter: IChapter | null = await Chapter.findOne({ chapterId });
       if (!chapter) return new Response(JSON.stringify({ msg: "No such chapter Found" }), { status: 400 });
 
       return new Response(JSON.stringify(chapter), { status: 200 });
