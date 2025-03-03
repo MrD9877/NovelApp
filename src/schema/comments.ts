@@ -2,7 +2,7 @@ import { InnerType } from "@/app/api/addComment/route";
 import { CommentType } from "@/validators/comment";
 import mongoose, { Document, Model } from "mongoose";
 const { Schema } = mongoose;
-interface IComment extends Document, InnerType<CommentType> {}
+interface IComment extends Document, Omit<InnerType<CommentType>, "_id" | "createdAt"> {}
 
 const commentsSchema = new Schema<IComment>(
   {
@@ -26,6 +26,14 @@ const commentsSchema = new Schema<IComment>(
       type: Schema.Types.String,
       required: true,
     },
+    like: [
+      {
+        email: {
+          type: Schema.Types.String,
+        },
+      },
+    ],
+    replies: [{ type: Schema.Types.String }],
   },
   { timestamps: true }
 );

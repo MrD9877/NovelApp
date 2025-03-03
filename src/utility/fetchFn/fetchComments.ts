@@ -1,8 +1,8 @@
 import { CommentsSchema } from "@/validators/comment";
 type CustomError = { msg: string };
 
-export const fetchComments = async ({ novelId, chapter }: { novelId: string; chapter: string | number }) => {
-  const res = await fetch(`/api/getComments?novelId=${novelId}&chapter=${chapter}`);
+export const fetchComments = async ({ novelId, chapter, tabValue }: { novelId: string; chapter: string | number; tabValue: string }) => {
+  const res = await fetch(`/api/getComments?novelId=${novelId}&chapter=${chapter}&sort=${tabValue}`);
   const data = await res.json();
   if (res.status === 200) {
     return CommentsSchema.parse(data);

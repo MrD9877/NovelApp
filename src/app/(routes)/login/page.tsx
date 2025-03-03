@@ -40,8 +40,8 @@ export default function LoginPage() {
       <form action={submitAction}>
         <div className="flex flex-col justify-center items-center gap-6 h-[50vh]">
           <div className="weInputContainer">
-            <div className="weLabelDiv">
-              <label className="weLabel" htmlFor="email">
+            <div className="weLabelDiv ">
+              <label className="weLabel dark:bg-[rgb(0,0,0)]" htmlFor="email">
                 Email
               </label>
             </div>
@@ -51,7 +51,7 @@ export default function LoginPage() {
           </div>
           <div className="weInputContainer">
             <div className="weLabelDiv">
-              <label className="weLabel" htmlFor="password">
+              <label className="weLabel dark:bg-[rgb(0,0,0)]" htmlFor="password">
                 Password
               </label>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { BookMarked, Home, MessageSquareMore, Search } from "lucide-react";
+import { BookMarked, Home, LogIn, MessageSquareMore, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ModeToggle from "./ThemeButton";
@@ -33,6 +33,11 @@ const items = [
     title: "Community",
     url: "/connect",
     icon: MessageSquareMore,
+  },
+  {
+    title: "Login",
+    url: "/login",
+    icon: LogIn,
   },
 ];
 

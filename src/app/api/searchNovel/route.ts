@@ -1,6 +1,33 @@
 import dbConnect from "@/lib/MonodbConnet";
 import { INovel, Novel } from "@/schema/novel";
 
+async function searchNovel({ query, path }: { query: string; path: string[] }): Promise<Partial<INovel>[] | null | undefined> {
+  const result = await Novel.aggregate([
+    {
+      $search: {
+        index: "custom-search",
+        text: {
+          query: query,
+          path: path,
+          fuzzy: { maxEdits: 2 },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        name: 1,
+        author: 1,
+        tags: 1,
+        genres: 1,
+        cover: 1,
+        novelId: 1,
+      },
+    },
+  ]);
+  return result;
+}
+
 export async function GET(request: Request) {
   await dbConnect();
   const { searchParams } = new URL(request.url); // Get query parameters
@@ -10,54 +37,10 @@ export async function GET(request: Request) {
   try {
     let novels: Partial<INovel>[] | null | undefined;
     if (search) {
-      novels = await Novel.aggregate([
-        {
-          $search: {
-            index: "custom-search", // Use the custom index name
-            text: {
-              query: search,
-              path: ["name", "author"],
-              fuzzy: { maxEdits: 2 }, // Allows minor typos
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 0, // Exclude _id field (optional)
-            name: 1, // Include name
-            author: 1, // Include author
-            tags: 1,
-            genres: 1,
-            cover: 1,
-            novelId: 1,
-          },
-        },
-      ]);
+      novels = await searchNovel({ path: ["name", "author"], query: search });
     }
     if (genre) {
-      novels = await Novel.aggregate([
-        {
-          $search: {
-            index: "custom-search", // Use the custom index name
-            text: {
-              query: genre,
-              path: ["genres"],
-              fuzzy: { maxEdits: 2 }, // Allows minor typos
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 0, // Exclude _id field (optional)
-            name: 1, // Include name
-            author: 1, // Include author
-            tags: 1,
-            genres: 1,
-            cover: 1,
-            novelId: 1,
-          },
-        },
-      ]);
+      novels = await searchNovel({ path: ["genres"], query: genre });
       // novels = await Novel.find({ genres: { $in: [genre] } }).select(["name", "author", "novelId", "cover", "genres", "tags"]);
     }
 
