@@ -50,6 +50,8 @@ function SwipeSpinnerComponent({ searchParams }: SwipeSpinnerComponent) {
 
 export default function ReadBookComponent({ searchParams }: ReadBookComponentType) {
   const navBar = useRef<HTMLDivElement>(null);
+  // const topNavBar = useRef<HTMLDivElement>(null);
+  // const [font, displayTopNav] = useHiddenNav(topNavBar);
   const [componentFont, displayNav] = useHiddenNav(navBar);
   const { fontSize, fontStyle } = componentFont;
   const [displayComments, setDisplayCommets] = useState(false);
@@ -114,10 +116,12 @@ export default function ReadBookComponent({ searchParams }: ReadBookComponentTyp
           </div>
         </div>
       )}
-      <div ref={navBar} style={{ display: displayNav ? "" : "none" }} className=" w-screen ">
+      {/* <div ref={topNavBar} style={{ display: displayTopNav ? "" : "none" }} className="w-screen">
+        <div className="bg-themeSuperDark/70 h-20  flex items-center m-0  justify-between px-6 fixed top-0 w-screen z-40"></div>
+      </div> */}
+      <div ref={navBar} style={{ display: displayNav ? "" : "none" }} className="w-screen ">
         <BookHiddenNav componentFont={componentFont} setDisplayCommets={setDisplayCommets} />
       </div>
-
       <div className="flex flex-col gap-4 h-[30vh] justify-end">
         <div className="w-fit mx-auto text-xl">Swipe Down To Continue</div>
         <div className="w-fit mx-auto">
