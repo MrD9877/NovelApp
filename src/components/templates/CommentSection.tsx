@@ -1,30 +1,42 @@
-import useNovelInfo from "@/hooks/useNovelInfo";
 import { fetchComments } from "@/utility/fetchFn/fetchComments";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { MoveLeft } from "lucide-react";
-import Image from "next/image";
 import React, { useState } from "react";
-import LoadingSpinner from "../ui/LoadingSpinner";
-import { useRouter } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import ErrorPage from "./ErrorPage";
-import { PopCommentBox } from "./CommentBox";
 import CommentCard from "../cards/CommetCard";
+import { useSelector } from "react-redux";
+import { StoreState } from "@/redux/userSlice";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
+import CommentNovelInfo from "./CommentNovelInfo";
+import CommentTabNav from "./CommentTabNav";
+import CommentBoxNav from "./CommentBoxNav";
 
 export default function CommentSection({ novelId, chapter, setDisplayCommets }: { novelId: string; chapter: string | number; setDisplayCommets: React.Dispatch<React.SetStateAction<boolean>> }) {
   const [tabValue, setTab] = useState<"newest" | "liked">("newest");
-  const novelQuery = useNovelInfo(novelId);
-  const router = useRouter();
-  const novelInfo = novelQuery.data;
-  const commentQuery = useQuery({
-    queryKey: ["comments", novelId, chapter, tabValue],
-    queryFn: async () => await fetchComments({ novelId, chapter, tabValue }),
+  const email = useSelector((state: StoreState) => state.email);
+  const { ref, inView } = useInView();
+  const queryClinet = useQueryClient();
+
+  const commentQuery = useInfiniteQuery({
+    queryKey: ["comments", novelId, chapter, email, tabValue],
+    queryFn: async ({ pageParam }) => await fetchComments({ novelId, chapter, tabValue, email, pageParam }),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
   });
-  console.log(commentQuery.data);
-  if (commentQuery.isLoading) return <>Loading...</>;
-  if (commentQuery.error) return <ErrorPage message={commentQuery.error.message} />;
+  const totalComments = commentQuery.data?.pages[0]?.totalComments;
+
+  const invalidateComment = () => {
+    queryClinet.invalidateQueries({ queryKey: ["comments", novelId, chapter, email] });
+  };
+
+  useEffect(() => {
+    if (inView) {
+      commentQuery.fetchNextPage();
+    }
+  }, [inView, commentQuery]);
   return (
     <div className="h-screen w-screen m-0 p-0">
       <div className="bg-black absolute z-30 min-h-screen w-screen top-0 mb-4 overflow-y-scroll">
@@ -33,47 +45,34 @@ export default function CommentSection({ novelId, chapter, setDisplayCommets }: 
           <span>Comment</span>
         </div>
 
-        <div className="h-[130px] my-4 mx-4 text-white">
-          {novelQuery.isLoading ? (
-            <LoadingSpinner width={"100vw"} height={"130px"} />
-          ) : (
-            <div className="flex gap-4">
-              <Image onClick={() => router.push(`/novel?novelId=${novelId}`)} alt="cover" src={`${process.env.NEXT_PUBLIC_AWS_BUCKET}/${novelInfo.cover}`} width={90} height={120} className="w-[90px] h-[120] object-cover rounded-md hover:opacity-65" />
-              <div className="flex flex-col my-3 gap-2">
-                <span>{novelInfo.name.length <= 50 ? novelInfo.name : `${novelInfo.name.slice(0, 47)}...`}</span>
-                <span className="text-themeLightText">{novelInfo.author}</span>
-              </div>
-            </div>
-          )}
-        </div>
+        <CommentNovelInfo novelId={novelId} />
+        <CommentTabNav setTab={setTab} totalComments={totalComments} tabValue={tabValue} />
 
-        <div className="shadow-lg w-[94vw] h-12 mx-auto rounded-xl flex justify-between items-center px-8 bg-white">
-          <div className="font-semibold">{commentQuery.data.length}Comments</div>
-          <Tabs onValueChange={(value: "newest" | "liked") => setTab(value)} defaultValue="newest">
-            <TabsList>
-              <TabsTrigger value="newest">Newest</TabsTrigger>
-              <TabsTrigger value="liked">Liked</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        <div className="w-[94vw] min-h-[80vh] bg-white my-4 mx-auto rounded-xl">
-          {Array.isArray(commentQuery.data) &&
-            commentQuery.data.map((comment) => {
+        <div className="w-[94vw] min-h-[80vh] bg-white my-4 mx-auto rounded-xl mb-10">
+          {commentQuery.isError ? (
+            <ErrorPage message={commentQuery.error.message} />
+          ) : commentQuery.isLoading ? (
+            <>Loading...</>
+          ) : (
+            commentQuery.data.pages.map((pageData, index) => {
               return (
-                <div key={comment._id}>
-                  <CommentCard comment={comment} />
+                <div key={index}>
+                  {Array.isArray(pageData.comments) &&
+                    pageData.comments.map((comment) => {
+                      return (
+                        <div key={comment._id}>
+                          <CommentCard comment={comment} invalidateComment={invalidateComment} />
+                        </div>
+                      );
+                    })}
                 </div>
               );
-            })}
+            })
+          )}
         </div>
+        <div ref={ref}></div>
       </div>
-      <div className="w-screen  fixed bottom-2 z-50 ">
-        <div className="w-[90vw] mx-auto bg-themeSuperLight bg-opacity-65 h-14 p-2 rounded-lg">
-          <div className="h-full w-full bg-white rounded-lg text-themeSuperLight flex justify-center items-center">
-            <PopCommentBox action={{ type: "comment", payload: { novelId, chapter } }}>What&apos;s your Thoughts?</PopCommentBox>
-          </div>
-        </div>
-      </div>
+      <CommentBoxNav setTab={setTab} novelId={novelId} chapter={chapter} invalidateComment={invalidateComment} />
     </div>
   );
 }

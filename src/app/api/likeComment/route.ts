@@ -11,13 +11,13 @@ export async function PUT(request: Request) {
   const cookieStore = await cookies();
   const { searchParams } = new URL(request.url); // Get query parameters
   const id = searchParams.get("id");
+  if (!id) return new Response(JSON.stringify({ msg: "missing params" }), { status: 400 });
   try {
     const userData = await authUser(cookieStore);
     if (userData && userData.email) {
       const user: UserType = await User.findOne({ email: userData.email });
       if (!user) throw Error("401");
       const checkforLiked = await Comments.findOne({ _id: id, "like.email": user.email });
-      console.log(checkforLiked);
       let editComment: UpdateWriteOpResult;
       const like = { email: user.email };
       if (checkforLiked) editComment = await Comments.updateOne({ _id: id }, { $pull: { like } });

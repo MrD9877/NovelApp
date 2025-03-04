@@ -1,16 +1,18 @@
 import { z } from "zod";
 
-export const LikedSchema = z.object({
-  email: z.string().email(),
-});
-
-export const ReplySchema = z.object({
-  replyId: z.string(),
-  email: z.string().email(),
-  userName: z.string(),
-  comment: z.string(),
-  like: z.array(LikedSchema),
-});
+export const ReplySchema = z.array(
+  z.object({
+    replyId: z.string(),
+    email: z.string().email(),
+    userName: z.string(),
+    comment: z.string(),
+    like: z.array(z.any()),
+    commentId: z.string(),
+    createdAt: z.string(),
+    isLiked: z.boolean(),
+    likeCount: z.number(),
+  })
+);
 
 export const CommentsSchema = z.array(
   z.object({
@@ -19,10 +21,12 @@ export const CommentsSchema = z.array(
     email: z.string().email(),
     userName: z.string(),
     comment: z.string(),
-    like: z.array(LikedSchema),
+    like: z.array(z.any()),
     replies: z.array(z.string()),
     _id: z.string(),
     createdAt: z.string(),
+    isLiked: z.boolean(),
+    likeCount: z.number(),
   })
 );
 

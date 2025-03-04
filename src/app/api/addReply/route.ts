@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       if (!user) throw Error("401");
       const replyId = generateRandom(32);
       const addReply = await Comments.updateOne({ _id: id }, { $push: { replies: replyId } });
-      const newReply = new Reply({ userName: user.userName, email: user.email, comment: comment, replyId });
+      const newReply = new Reply({ userName: user.userName, email: user.email, comment: comment, replyId, commentId: id });
       await newReply.save();
       if (addReply.acknowledged) return new Response(JSON.stringify({ msg: "added" }), { status: 200 });
       else throw Error("Not acknowledged");

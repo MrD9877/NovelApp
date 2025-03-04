@@ -2,7 +2,6 @@ import dbConnect from "@/lib/MonodbConnet";
 import { User, UserType } from "@/schema/user";
 import { cookies } from "next/headers";
 import { authUser } from "../utilities/authUser";
-import { INovel, Novel } from "@/schema/novel";
 
 export async function GET(request: Request) {
   await dbConnect();
@@ -11,8 +10,6 @@ export async function GET(request: Request) {
   const chapterNumber = searchParams.get("chapter");
   const cookieStore = await cookies();
   try {
-    const checkNovel: INovel = await Novel.findOne({ novelId });
-    if (!checkNovel) return new Response(JSON.stringify({ msg: "No novel found" }), { status: 400 });
     const userData = await authUser(cookieStore);
     if (userData && userData.email) {
       const user: UserType = await User.findOne({ email: userData.email });

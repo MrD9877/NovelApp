@@ -1,19 +1,21 @@
 "use client";
-import { useToast } from "@/hooks/use-toast";
-import { StoreState } from "@/redux/userSlice";
+
+import { useInfiniteQuery } from "@tanstack/react-query";
 import React from "react";
-import { useSelector } from "react-redux";
 
 export default function Testpage() {
-  const { toast } = useToast();
-  const test = () => {
-    toast({ title: "test", description: "It is working just Fine" });
-  };
-  const userName = useSelector((state: StoreState) => state.email);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ["comments"],
+    queryFn: ({ pageParam }) => {
+      console.log(pageParam);
+      return { nextPage: pageParam < 10 ? pageParam + 1 : null };
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
   return (
     <div>
-      <button onClick={test}>Test test</button>
-      userName:{userName}
+      <button onClick={() => fetchNextPage()}>Test test</button>
     </div>
   );
 }

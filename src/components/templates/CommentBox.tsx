@@ -15,12 +15,15 @@ type CommentBoxAction =
       payload: {
         novelId: string;
         chapter: string | number;
+        invalidateComment: () => void;
+        setTab: React.Dispatch<React.SetStateAction<"newest" | "liked">>;
       };
     }
   | {
       type: "reply";
       payload: {
         id: string;
+        invalidateReply: (id: string) => void;
       };
     };
 
@@ -31,18 +34,27 @@ export function PopCommentBox({ children, action }: { children: string | React.R
   const addComment = async () => {
     setloading(true);
     try {
+      let res: Response;
       if (action.type === "comment") {
-        const res = await fetch("/api/addComment", { method: "POST", body: JSON.stringify({ comment, ...action.payload }) });
-        if (res.status === 200) {
-          toast("Comment Added");
-          setComment("");
-          setClose(true);
-        } else if (res.status == 401) {
-          toast("Login to add comment");
-        } else {
-          const data = await res.json();
-          toast(data.msg);
+        res = await fetch("/api/addComment", { method: "POST", body: JSON.stringify({ comment, ...action.payload }) });
+      }
+      if (action.type === "reply") {
+        res = await fetch("/api/addReply", { method: "POST", body: JSON.stringify({ comment, ...action.payload }) });
+      }
+      if (res.status === 200) {
+        toast("Comment Added");
+        setComment("");
+        setClose(true);
+        if (action.type === "reply") action.payload.invalidateReply(action.payload.id);
+        else {
+          action.payload.invalidateComment();
+          action.payload.setTab("newest");
         }
+      } else if (res.status == 401) {
+        toast("Login to add comment");
+      } else {
+        const data = await res.json();
+        toast(data.msg);
       }
     } catch (err) {
       console.log(err);
