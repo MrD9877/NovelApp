@@ -26,7 +26,7 @@ export default function RootLayout({
             <QueryProvider>
               <SidebarProvider>
                 <SideBarNavigator />
-                <main>
+                <main className="w-screen h-svh">
                   <SidebarTrigger />
                   {children}
                   <ThemeToaster />

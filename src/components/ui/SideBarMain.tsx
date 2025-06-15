@@ -1,12 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { BookMarked, Home, LogIn, MessageSquareMore, PencilLine, Search } from "lucide-react";
+import { BookMarked, Home, LogIn, PencilLine, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ModeToggle from "./ThemeButton";
 import { useEffect } from "react";
 import Image from "next/image";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const items = [
   {
@@ -23,16 +24,6 @@ const items = [
     title: "Explore",
     url: "/explore",
     icon: Search,
-  },
-  {
-    title: "Notifications",
-    url: "/Notifications",
-    icon: BookMarked,
-  },
-  {
-    title: "Community",
-    url: "/connect",
-    icon: MessageSquareMore,
   },
   {
     title: "Login",
@@ -54,6 +45,7 @@ export default function SideBarMain() {
   const pathname = usePathname();
   const [menuBadgeNumbers, setMenuBadge] = useState<MenuBadge>({ Notifications: 0, Community: 2 });
   const { toggleSidebar } = useSidebar();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMenuBadge({ Notifications: 0, Community: 2 });
@@ -64,7 +56,12 @@ export default function SideBarMain() {
         <SidebarContent>
           <SidebarGroup className="justify-between flex-row items-center pb-0 pr-4 pt-3">
             {/* app icon  */}
-            <Link href={"/home"} onClick={() => toggleSidebar()}>
+            <Link
+              href={"/home"}
+              onClick={() => {
+                if (isMobile) toggleSidebar();
+              }}
+            >
               <Image width={40} height={40} src={"/images/icon.ico"} alt="icon" />
             </Link>
             {/* dark light mode  */}
@@ -76,7 +73,12 @@ export default function SideBarMain() {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <Link href={item.url} onClick={() => toggleSidebar()}>
+                    <Link
+                      href={item.url}
+                      onClick={() => {
+                        if (isMobile) toggleSidebar();
+                      }}
+                    >
                       <SidebarMenuButton asChild isActive={pathname === item.url}>
                         <div>
                           <item.icon />

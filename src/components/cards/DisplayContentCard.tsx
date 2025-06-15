@@ -30,9 +30,9 @@ export default function DisplayContentCard({ data }: { data: NovelsData }) {
   return (
     <div className="px-4">
       {Array.isArray(data) && data.length > 0 ? (
-        data.map((item) => {
+        data.map((item, index) => {
           return (
-            <div key={item.novelId} className="flex mx-auto w-fit my-4 gap-2 max-w-[80vw]">
+            <div key={`${item.novelId}+${index}`} className="flex mx-auto w-fit my-4 gap-2 max-w-[80vw]">
               <Image onClick={() => goToNovel(item.novelId)} src={`${process.env.NEXT_PUBLIC_AWS_BUCKET}/${item.cover}`} alt="image" width={90} height={100} className="hover:opacity-65" />
               <div className="flex flex-col align-middle overflow-scroll mt-3">
                 <ShowGenreTags genres={item.genres} />

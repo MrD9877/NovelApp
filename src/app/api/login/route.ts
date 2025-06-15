@@ -3,7 +3,7 @@ import { IUser, User } from "@/schema/user";
 
 import { cookies } from "next/headers";
 import { verifyPasswordFn } from "../utilities/hashPassword";
-import { tokenGenerator } from "../utilities/tokenGenerators";
+import { setAuthCookies } from "../utilities/setAuthCookies";
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -16,14 +16,8 @@ export async function POST(request: Request) {
     if (!user) return new Response(JSON.stringify({ msg: "No User Found" }), { status: 400 });
     const verifyPassword = await verifyPasswordFn(password, user.password);
     if (verifyPassword) {
-      const accessToken = await tokenGenerator({ email, userName: user.userName }, "1d");
-      const refreshToken = await tokenGenerator({ email, userName: user.userName }, "50d");
-      if (!accessToken && !refreshToken) return new Response(JSON.stringify({ msg: "Internal server error" }), { status: 500 });
-      if (accessToken && refreshToken) {
-        cookieStore.set("accessToken", accessToken);
-        cookieStore.set("refreshToken", refreshToken);
-      }
-      return new Response(JSON.stringify({ msg: "welcome" }), { status: 200 });
+      const res = await setAuthCookies(email, user.userName, cookieStore);
+      return res;
     }
     return new Response(JSON.stringify({ msg: "UnAuthorized" }), { status: 401 });
   } catch (err) {

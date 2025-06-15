@@ -3,9 +3,9 @@ import React from "react";
 
 export default function ExpoloreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
+    <main className="w-full h-fit relative">
       <SearchNav />
       {children}
-    </div>
+    </main>
   );
 }

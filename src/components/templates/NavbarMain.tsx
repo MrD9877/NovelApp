@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 export default function NavbarMain() {
   const pathname = usePathname();
   return (
-    <div className="md:invisible ">
+    <div className="sm:hidden ">
       <span className="absolute h-14 flex items-center px-2 py-4 ">
         <SidebarTrigger hidden={false} className="text-white" />
       </span>

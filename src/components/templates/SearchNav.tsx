@@ -38,10 +38,10 @@ export default function SearchNav() {
 
   return (
     <div>
-      <div className="flex flex-col absolute h-12">
-        <div className=" flex align-middle items-center justify-between px-4 text-black bg-white py-4 dark:bg-inherit dark:text-white w-screen">
-          <SidebarTrigger hidden={false} className="text-black dark:text-white" />
-          <input onChange={onInputFn} value={search || ""} className="outline-none px-3" type="text" placeholder="Search by name or email.." />
+      <div className="flex flex-col absolute h-12 w-full sm:px-10">
+        <div className=" flex align-middle items-center justify-between px-4 text-black bg-white py-4 dark:bg-inherit dark:text-white ">
+          <SidebarTrigger hidden={false} className="text-black dark:text-white dark:hover:text-black sm:hidden" />
+          <input onChange={onInputFn} value={search || ""} className="outline-none px-3 sm:w-3/4" type="text" placeholder="Search by name or author.." />
           <svg
             onClick={() => {
               setSearch("");
